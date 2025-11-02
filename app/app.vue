@@ -2,7 +2,6 @@
   <div class="bg-zinc-100 box-border flex flex-col gap-4 min-[480px]:gap-6 items-center justify-center p-2 relative min-h-screen">
     <div class="flex flex-col justify-center relative text-[#121212] text-xs min-[480px]:text-sm text-center tracking-[-0.3px] px-2 w-full">
       <p class="leading-5 min-[480px]:leading-6 text-base min-[480px]:text-lg whitespace-normal min-[480px]:whitespace-pre break-words">
-        ✶✶✶✶<br aria-hidden="true" />
         Displays a random <a target="_blank" href="https://data.cityofchicago.org/" class="underline">City of Chicago</a> employee
       </p>
     </div>
@@ -99,11 +98,11 @@ const toggleFlip = () => {
 
 <style lang="css">
   body {
-    font-family: "Source Sans 3", sans-serif !important;
+    font-family: "Source Sans 3", sans-serif;
   }
 
   .employee-name {
-    font-family: "Big Shoulders Display", sans-serif !important;
+    font-family: "Big Shoulders Display", sans-serif;
   }
 
   .card-container {
