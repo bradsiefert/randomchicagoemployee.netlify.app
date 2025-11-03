@@ -26,8 +26,13 @@
               <div class="absolute bottom-8 min-[480px]:bottom-[41px] capitalize flex flex-col font-medium justify-center left-20 min-[480px]:left-[127px] text-[#121212] text-base min-[480px]:text-lg tracking-[-0.3px] translate-y-1/2 right-12 min-[480px]:right-auto min-[480px]:w-[305px]" data-name="department">
                 <p class="leading-5 min-[480px]:leading-6">Department Of Business Affairs And Consumer Protection</p>
               </div>
-              <div class="absolute right-3 min-[480px]:right-4 size-8 min-[480px]:size-10 top-3 min-[480px]:top-4 cursor-pointer transition-all duration-300 hover:scale-110 hover:rotate-180 hover:bg-gray-100 rounded-lg p-1" @click="toggleFlip" data-name="ArrowsCounterClockwise">
-                <img alt="Refresh" class="block size-full transition-opacity duration-300 hover:opacity-80" :src="imgArrowsCounterClockwise" />
+              <div class="absolute right-3 min-[480px]:right-4 top-3 min-[480px]:top-4 flex gap-2 items-center">
+                <div class="size-8 min-[480px]:size-9 cursor-pointer transition-all duration-300 hover:scale-110 hover:bg-gray-100 rounded-lg p-1" @click="refreshEmployee" data-name="UserSwitch">
+                  <img alt="Change user" class="block size-full transition-opacity duration-300 hover:opacity-80" :src="imgUserSwitch" />
+                </div>
+                <div class="size-8 min-[480px]:size-9 cursor-pointer transition-all duration-300 hover:scale-110 hover:rotate-180 hover:bg-gray-100 rounded-lg p-1" @click="toggleFlip" data-name="ArrowsCounterClockwise">
+                  <img alt="Refresh" class="block size-full transition-opacity duration-300 hover:opacity-80" :src="imgArrowsCounterClockwise" />
+                </div>
               </div>
             </div>
           </div>
@@ -51,13 +56,18 @@
                   <div>
                     <p class="leading-5 whitespace-pre">
                       <span>Annual Salary:</span>
-                      <span> $65,640</span>
+                      <span>&nbsp;$65,640</span>
                     </p>
                   </div>
                 </div>
               </div>
-              <div class="absolute right-3 min-[480px]:right-4 size-8 min-[480px]:size-10 top-3 min-[480px]:top-4 cursor-pointer transition-all duration-300 hover:scale-110 hover:rotate-180 hover:bg-gray-100 rounded-lg p-1" @click="toggleFlip" data-name="ArrowsCounterClockwise">
-                <img alt="Refresh" class="block size-full transition-opacity duration-300 hover:opacity-80" :src="imgArrowsCounterClockwise" />
+              <div class="absolute right-3 min-[480px]:right-4 top-3 min-[480px]:top-4 flex gap-2 items-center">
+                <div class="size-8 min-[480px]:size-9 cursor-pointer transition-all duration-300 hover:scale-110 hover:bg-gray-100 rounded-lg p-1" @click="refreshEmployee" data-name="UserSwitch">
+                  <img alt="Change user" class="block size-full transition-opacity duration-300 hover:opacity-80" :src="imgUserSwitch" />
+                </div>
+                <div class="size-8 min-[480px]:size-9 cursor-pointer transition-all duration-300 hover:scale-110 hover:rotate-180 hover:bg-gray-100 rounded-lg p-1" @click="toggleFlip" data-name="ArrowsCounterClockwise">
+                  <img alt="Refresh" class="block size-full transition-opacity duration-300 hover:opacity-80" :src="imgArrowsCounterClockwise" />
+                </div>
               </div>
             </div>
           </div>
@@ -88,15 +98,24 @@ useHead({
 
 const imgChiVertical = "/chicago-logo-vertical.png";
 const imgArrowsCounterClockwise = "/ArrowsCounterClockwise.svg";
+const imgUserSwitch = "/UserSwitch.svg";
 
 const isFlipped = ref(false);
 
 const toggleFlip = () => {
   isFlipped.value = !isFlipped.value;
 };
+
+const refreshEmployee = () => {
+  // TODO: Implement employee refresh logic
+};
 </script>
 
 <style lang="css">
+  html {
+    background-color: rgb(244 244 245);
+  }
+
   body {
     font-family: "Source Sans 3", sans-serif;
   }
