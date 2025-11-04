@@ -20,6 +20,10 @@ export default defineNuxtConfig({
     // Ensure snowflake-sdk is bundled for serverless functions
     externals: {
       inline: ['snowflake-sdk']
-    }
+    },
+    // Configure for Netlify serverless
+    preset: 'netlify',
+    // Preserve modules - don't minify to help with bundling
+    minify: false
   }
 })
