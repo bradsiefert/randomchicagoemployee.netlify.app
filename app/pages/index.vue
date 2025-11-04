@@ -1,5 +1,11 @@
 <template>
   <div class="bg-zinc-100 flex flex-col gap-4 min-[480px]:gap-6 items-center justify-center p-2 relative min-h-screen">
+    <!-- Error message display -->
+    <div v-if="error" class="w-full max-w-[calc(100%-1rem)] min-[480px]:w-[448px] bg-red-50 border border-red-200 rounded-md p-4 mb-4">
+      <p class="text-red-800 font-semibold mb-2">Error loading employee data</p>
+      <p class="text-red-700 text-sm">{{ error }}</p>
+    </div>
+    
     <div class="flex flex-col justify-center relative text-[#121212] text-xs min-[480px]:text-sm text-center tracking-[-0.3px] px-2 w-full">
       <p class="leading-5 min-[480px]:leading-6 text-base min-[480px]:text-lg whitespace-normal min-[480px]:whitespace-pre break-words">
         Displays a random <a target="_blank" href="https://data.cityofchicago.org/" class="underline">City of Chicago</a> employee
