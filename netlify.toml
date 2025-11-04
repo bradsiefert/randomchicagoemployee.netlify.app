@@ -1,0 +1,22 @@
+# Netlify Configuration
+# This file configures Netlify build and deployment settings
+
+[build]
+  # Nuxt build command is handled automatically by Netlify's Nuxt plugin
+  # Command defaults to: npm run build
+
+# Secret Scanning Configuration
+# Note: SECRETS_SCAN_OMIT_PATHS and SECRETS_SCAN_OMIT_KEYS must be set as
+# environment variables in Netlify's project settings (not in this file).
+#
+# To exclude server-side function code from secret scanning, add these
+# environment variables in Netlify:
+#
+# SECRETS_SCAN_OMIT_PATHS=.netlify/functions-internal/server/**,dist/_nuxt/**
+#
+# Or exclude specific environment variable names:
+#
+# SECRETS_SCAN_OMIT_KEYS=SNOWFLAKE_ACCOUNT,SNOWFLAKE_USERNAME,SNOWFLAKE_PASSWORD,SNOWFLAKE_WAREHOUSE,SNOWFLAKE_DATABASE,SNOWFLAKE_SCHEMA
+#
+# See README.md for detailed instructions.
+
