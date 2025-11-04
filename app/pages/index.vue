@@ -77,13 +77,14 @@
                     </div>
                   </Transition>
                   <Transition name="fade" mode="out-in">
-                    <div v-if="employee && salary" :key="`salary-${employeeKey}`">
+                    <div v-if="employee && (isHourly ? hourlyRate : salary)" :key="`compensation-${employeeKey}`">
                       <p class="leading-5 whitespace-pre">
-                        <span>Annual Salary:</span>
-                        <span>&nbsp;{{ salary }}</span>
+                        <span v-if="isHourly">Hourly Rate:</span>
+                        <span v-else>Annual Salary:</span>
+                        <span>&nbsp;{{ isHourly ? hourlyRate : salary }}</span>
                       </p>
                     </div>
-                    <div v-else :key="`loading-salary-${employeeKey}`">
+                    <div v-else :key="`loading-compensation-${employeeKey}`">
                       <p class="leading-5 whitespace-pre text-gray-400 animate-pulse">Loading...</p>
                     </div>
                   </Transition>
@@ -134,7 +135,7 @@ const fetchEmployee = async () => {
   error.value = null;
   
   try {
-    const response = await $fetch('/api/employee');
+    const response = await $fetch<{ success: boolean; data?: any }>('/api/employee');
     
     if (response.success && response.data) {
       // Increment key to force transition
@@ -195,20 +196,24 @@ const parseName = (fullName: string): { firstName: string; lastName: string } =>
   
   if (parts.length >= 2) {
     // Format: "LAST NAME, FIRST NAME"
+    const lastName = parts[0] || '';
+    const firstName = parts.slice(1).join(' ') || ''; // Handle cases like "HECTOR F" or "FIRST MIDDLE"
     return {
-      lastName: parts[0],
-      firstName: parts.slice(1).join(' ') // Handle cases like "HECTOR F" or "FIRST MIDDLE"
+      lastName,
+      firstName
     };
-  } else if (parts.length === 1) {
+  } else if (parts.length === 1 && parts[0]) {
     // No comma, try to split by space (assume "FIRST LAST")
     const spaceParts = parts[0].split(' ');
     if (spaceParts.length >= 2) {
+      const firstName = spaceParts[0] || '';
+      const lastName = spaceParts.slice(1).join(' ') || '';
       return {
-        firstName: spaceParts[0],
-        lastName: spaceParts.slice(1).join(' ')
+        firstName,
+        lastName
       };
     }
-    return { firstName: parts[0], lastName: '' };
+    return { firstName: parts[0] || '', lastName: '' };
   }
   
   return { firstName: '', lastName: '' };
@@ -242,6 +247,34 @@ const salary = computed(() => {
   const sal = employee.value?.ANNUAL_SALARY || employee.value?.SALARY || employee.value?.annualSalary || employee.value?.salary || employee.value?.annual_salary;
   return formatSalary(sal);
 });
+
+// Check if employee is hourly
+const isHourly = computed(() => {
+  const salaryOrHourly = getField(employee.value, 'SALARY_OR_HOURLY', 'salaryOrHourly', 'salary_or_hourly');
+  if (salaryOrHourly) {
+    const upperValue = salaryOrHourly.toUpperCase();
+    return upperValue === 'HOURLY' || upperValue.includes('HOURLY');
+  }
+  return false;
+});
+
+// Format hourly rate
+const formatHourlyRate = (rate: number | string | null | undefined): string => {
+  if (rate === null || rate === undefined || rate === '') {
+    return '$0.00';
+  }
+  const numRate = typeof rate === 'string' ? parseFloat(rate) : rate;
+  if (isNaN(numRate)) {
+    return '$0.00';
+  }
+  return `$${numRate.toFixed(2)}`;
+};
+
+const hourlyRate = computed(() => {
+  const rate = employee.value?.HOURLY_RATE || employee.value?.hourlyRate || employee.value?.hourly_rate || employee.value?.RATE || employee.value?.rate;
+  return formatHourlyRate(rate);
+});
+
 const employeeType = computed(() => {
   // Check SALARY_OR_HOURLY first to determine if employee is salaried or hourly
   const salaryOrHourly = getField(employee.value, 'SALARY_OR_HOURLY', 'salaryOrHourly', 'salary_or_hourly');
