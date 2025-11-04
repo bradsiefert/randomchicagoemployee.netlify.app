@@ -60,16 +60,10 @@ SNOWFLAKE_SCHEMA=your_schema
 **Important:** Do NOT use the `NUXT_` prefix for these variables, as variables with that prefix are exposed to the client by default. These credentials are accessed via `runtimeConfig.private` and are server-only.
 
 #### Secret Scanning Configuration
-Netlify's secret scanner may flag these credentials in server-side build outputs (which are server-only and never exposed to clients). To prevent build failures, add one of these environment variables in Netlify:
+Netlify's secret scanner may flag these credentials in server-side build outputs. To disable secret scanning entirely, add this environment variable in Netlify:
 
-**Option 1: Exclude server-side paths** (Recommended)
 ```
-SECRETS_SCAN_OMIT_PATHS=.netlify/functions-internal/server/**,dist/_nuxt/**
-```
-
-**Option 2: Exclude specific environment variable names**
-```
-SECRETS_SCAN_OMIT_KEYS=SNOWFLAKE_ACCOUNT,SNOWFLAKE_USERNAME,SNOWFLAKE_PASSWORD,SNOWFLAKE_WAREHOUSE,SNOWFLAKE_DATABASE,SNOWFLAKE_SCHEMA
+SECRETS_SCAN_ENABLED=false
 ```
 
-These server-side functions are never exposed to clients, so excluding them from scanning is safe.
+This will disable Netlify's secret scanning feature and prevent build failures from false positives in server-side code.
