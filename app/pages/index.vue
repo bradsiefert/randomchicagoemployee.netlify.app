@@ -10,36 +10,42 @@
         <div class="card-front">
           <div class="bg-white border border-gray-300 relative rounded-md w-full h-full" data-name="business-card-front">
             <div class="h-full shadow-md overflow-clip relative rounded-[inherit] w-full">
-              <div class="absolute flex flex-col gap-1.5 min-[480px]:gap-2 items-start left-20 min-[480px]:left-[127px] text-[#121212] top-1/2 translate-y-[-50%] right-12 min-[480px]:right-auto" data-name="name+role">
-                <div class="flex flex-col employee-name font-extrabold justify-center relative tracking-[-0.2px] w-full">
+              <!-- Loading state: show only loading indicator -->
+              <template v-if="!isNameReady">
+                <div class="absolute flex flex-col gap-1.5 min-[480px]:gap-2 items-start left-20 min-[480px]:left-[127px] text-[#121212] top-1/2 translate-y-[-50%] right-12 min-[480px]:right-auto" data-name="name+role">
+                  <div class="flex flex-col employee-name font-extrabold justify-center relative tracking-[-0.2px] w-full">
+                    <p class="leading-7 min-[480px]:leading-[29px] text-3xl min-[480px]:text-4xl text-gray-400 animate-pulse">Loading...</p>
+                  </div>
+                </div>
+              </template>
+              
+              <!-- Data ready: show all fields together -->
+              <template v-else>
+                <div class="absolute flex flex-col gap-1.5 min-[480px]:gap-2 items-start left-20 min-[480px]:left-[127px] text-[#121212] top-1/2 translate-y-[-50%] right-12 min-[480px]:right-auto" data-name="name+role">
+                  <div class="flex flex-col employee-name font-extrabold justify-center relative tracking-[-0.2px] w-full">
+                    <Transition name="fade" mode="out-in">
+                      <p :key="`name-${employeeKey}`" class="leading-7 min-[480px]:leading-[29px] text-3xl min-[480px]:text-4xl">
+                        <span v-if="firstName" class="employee-name font-extrabold">{{ firstName }}</span>
+                        <span v-if="firstName && lastName">&nbsp;</span>
+                        <span v-if="lastName" class="employee-name font-medium">{{ lastName }}</span>
+                      </p>
+                    </Transition>
+                  </div>
+                  <div class="capitalize flex flex-col italic justify-center relative text-lg tracking-[-0.3px] w-full">
+                    <Transition name="fade" mode="out-in">
+                      <p v-if="jobTitle" :key="`title-${employeeKey}`" class="leading-5 min-[480px]:leading-6">{{ jobTitle }}</p>
+                    </Transition>
+                  </div>
+                </div>
+                <div class="absolute bottom-4 min-[480px]:bottom-6 capitalize flex flex-col font-medium justify-end left-20 min-[480px]:left-[127px] text-[#121212] text-base min-[480px]:text-lg tracking-[-0.3px] right-12 min-[480px]:right-auto min-[480px]:w-[305px]" data-name="department">
                   <Transition name="fade" mode="out-in">
-                    <p v-if="employee && (firstName || lastName)" :key="`name-${employeeKey}`" class="leading-7 min-[480px]:leading-[29px] text-3xl min-[480px]:text-4xl">
-                      <span v-if="firstName" class="employee-name font-extrabold">{{ firstName }}</span>
-                      <span v-if="firstName && lastName">&nbsp;</span>
-                      <span v-if="lastName" class="employee-name font-medium">{{ lastName }}</span>
-                    </p>
-                    <p v-else-if="employee && !loading" :key="`error-${employeeKey}`" class="leading-7 min-[480px]:leading-[29px] text-3xl min-[480px]:text-4xl text-gray-500">
-                      <!-- Debug: Show available fields -->
-                      <span class="text-xs">Check console for field names</span>
-                    </p>
-                    <p v-else :key="`loading-name-${employeeKey}`" class="leading-7 min-[480px]:leading-[29px] text-3xl min-[480px]:text-4xl text-gray-400 animate-pulse">Loading...</p>
+                    <p v-if="department" :key="`dept-${employeeKey}`" class="leading-5 min-[480px]:leading-6 mb-0">{{ department }}</p>
                   </Transition>
                 </div>
-                <div class="capitalize flex flex-col italic justify-center relative text-lg tracking-[-0.3px] w-full">
-                  <Transition name="fade" mode="out-in">
-                    <p v-if="employee && jobTitle" :key="`title-${employeeKey}`" class="leading-5 min-[480px]:leading-6">{{ jobTitle }}</p>
-                    <p v-else :key="`loading-title-${employeeKey}`" class="leading-5 min-[480px]:leading-6 text-gray-400 animate-pulse">Loading...</p>
-                  </Transition>
-                </div>
-              </div>
+              </template>
+              
               <div class="absolute h-32 min-[480px]:h-[208px] left-4 min-[480px]:left-6 top-1/2 translate-y-[-50%] w-12 min-[480px]:w-[71px]" data-name="CHI-vertical">
                 <img alt="City of Chicago Logo" class="absolute inset-0 object-center object-contain size-full" :src="imgChiVertical" />
-              </div>
-              <div class="absolute bottom-4 min-[480px]:bottom-6 capitalize flex flex-col font-medium justify-end left-20 min-[480px]:left-[127px] text-[#121212] text-base min-[480px]:text-lg tracking-[-0.3px] right-12 min-[480px]:right-auto min-[480px]:w-[305px]" data-name="department">
-                <Transition name="fade" mode="out-in">
-                  <p v-if="employee && department" :key="`dept-${employeeKey}`" class="leading-5 min-[480px]:leading-6 mb-0">{{ department }}</p>
-                  <p v-else :key="`loading-dept-${employeeKey}`" class="leading-5 min-[480px]:leading-6 mb-0 text-gray-400 animate-pulse">Loading...</p>
-                </Transition>
               </div>
               <div class="absolute right-3 min-[480px]:right-4 top-3 min-[480px]:top-4 flex gap-2 items-center">
                 <div class="size-8 min-[480px]:size-9 cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 hover:bg-gray-100 active:bg-gray-200 rounded-lg p-1" @click="refreshEmployee" data-name="UserSwitch">
@@ -55,37 +61,30 @@
         <div class="card-back">
           <div class="bg-white border border-gray-300 shadow-md relative rounded-md w-full h-full" data-name="business-card-back">
             <div class="h-full overflow-clip relative rounded-[inherit] w-full flex items-center justify-center">
-              <div class="flex flex-col gap-4 items-center relative max-w-[255px] min-[480px]:max-w-none">
+              <div v-if="isFlipped && isNameReady" class="flex flex-col gap-4 items-center relative max-w-[255px] min-[480px]:max-w-none">
                 <div class="flex flex-col employee-name font-extrabold justify-center relative text-[#e71a40] text-5xl min-[480px]:text-[72px] text-center tracking-tight">
                   <p class="leading-[1.2]">✶✶✶✶</p>
                 </div>
                 <div class="flex flex-col employee-name font-extrabold justify-center relative text-[#121212] text-3xl min-[480px]:text-4xl text-center tracking-[-0.2px]">
                   <Transition name="fade" mode="out-in">
-                    <p v-if="employee && firstName && lastName" :key="`name-back-${employeeKey}`" class="leading-[29px]">
+                    <p v-if="firstName && lastName" :key="`name-back-${employeeKey}`" class="leading-[29px]">
                       <span class="employee-name font-extrabold">{{ firstName }}</span> <span class="employee-name font-medium">{{ lastName }}</span>
                     </p>
-                    <p v-else :key="`loading-name-back-${employeeKey}`" class="leading-[29px] text-gray-400 animate-pulse">Loading...</p>
                   </Transition>
                 </div>
                 <div class="capitalize flex flex-col gap-1 items-center justify-center relative text-[#121212] text-base tracking-[-0.3px]">
                   <Transition name="fade" mode="out-in">
-                    <div v-if="employee && employeeType" :key="`type-${employeeKey}`">
+                    <div v-if="employeeType" :key="`type-${employeeKey}`">
                       <p class="leading-5 whitespace-pre">{{ employeeType }}</p>
-                    </div>
-                    <div v-else :key="`loading-type-${employeeKey}`">
-                      <p class="leading-5 whitespace-pre text-gray-400 animate-pulse">Loading...</p>
                     </div>
                   </Transition>
                   <Transition name="fade" mode="out-in">
-                    <div v-if="employee && (isHourly ? hourlyRate : salary)" :key="`compensation-${employeeKey}`">
+                    <div v-if="isHourly ? hourlyRate : salary" :key="`compensation-${employeeKey}`">
                       <p class="leading-5 whitespace-pre">
                         <span v-if="isHourly">Hourly Rate:</span>
                         <span v-else>Annual Salary:</span>
                         <span>&nbsp;{{ isHourly ? hourlyRate : salary }}</span>
                       </p>
-                    </div>
-                    <div v-else :key="`loading-compensation-${employeeKey}`">
-                      <p class="leading-5 whitespace-pre text-gray-400 animate-pulse">Loading...</p>
                     </div>
                   </Transition>
                 </div>
@@ -111,7 +110,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, nextTick } from 'vue';
 
 const imgChiVertical = "/chicago-logo-vertical.png";
 const imgArrowsCounterClockwise = "/ArrowsCounterClockwise.svg";
@@ -141,6 +140,17 @@ const fetchEmployee = async () => {
       employee.value = response.data;
       // Reset flip state when new employee is loaded
       isFlipped.value = false;
+      
+      // Wait for Vue to update computed properties and ensure name is ready
+      await nextTick();
+      
+      // Keep loading true until name is ready
+      // Poll briefly to ensure name computed properties have evaluated
+      let attempts = 0;
+      while (!isNameReady.value && attempts < 10) {
+        await new Promise(resolve => setTimeout(resolve, 10));
+        attempts++;
+      }
     } else {
       error.value = 'No employee data returned from API';
     }
@@ -232,6 +242,17 @@ const firstName = computed(() => {
 const lastName = computed(() => {
   return properCase(nameParts.value.lastName);
 });
+
+// Check if name data is ready (used to show/hide all fields together)
+const isNameReady = computed(() => {
+  return !!(firstName.value || lastName.value);
+});
+
+// Combined loading state: true if loading OR if employee exists but name isn't ready
+const isLoadingData = computed(() => {
+  return loading.value || (employee.value && !isNameReady.value);
+});
+
 const jobTitle = computed(() => {
   const title = getField(employee.value, 'JOB_TITLES', 'JOB_TITLE', 'jobTitle', 'JOBTITLE', 'job_title', 'TITLE', 'title');
   return properCase(title);
@@ -339,9 +360,12 @@ onMounted(() => {
   }
 
   /* Fade transition for employee data */
-  .fade-enter-active,
+  .fade-enter-active {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
   .fade-leave-active {
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.1s ease, transform 0.1s ease;
   }
 
   .fade-enter-from {
