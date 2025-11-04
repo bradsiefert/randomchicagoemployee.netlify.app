@@ -15,5 +15,11 @@ export default defineNuxtConfig({
         schema: process.env.SNOWFLAKE_SCHEMA,
       }
     }
+  },
+  nitro: {
+    // Ensure snowflake-sdk is bundled for serverless functions
+    externals: {
+      inline: ['snowflake-sdk']
+    }
   }
 })
