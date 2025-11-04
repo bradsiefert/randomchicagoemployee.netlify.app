@@ -91,9 +91,6 @@
                 </div>
               </div>
               <div class="absolute right-3 min-[480px]:right-4 top-3 min-[480px]:top-4 flex gap-2 items-center">
-                <!-- <div class="size-8 min-[480px]:size-9 cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 hover:bg-gray-100 active:bg-gray-200 rounded-lg p-1" @click="refreshEmployee" data-name="UserSwitch">
-                  <img alt="Change user" class="block size-full transition-opacity duration-300 hover:opacity-80 active:opacity-60" :src="imgUserSwitch" />
-                </div> -->
                 <div class="size-8 min-[480px]:size-9 cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 hover:rotate-180 hover:bg-gray-100 active:bg-gray-200 rounded-lg p-1" @click="toggleFlip" data-name="ArrowsCounterClockwise">
                   <img alt="Refresh" class="block size-full transition-opacity duration-300 hover:opacity-80 active:opacity-60" :src="imgArrowsCounterClockwise" />
                 </div>
@@ -107,7 +104,7 @@
       <p class="leading-5 min-[480px]:leading-6 text-sm min-[480px]:text-lg whitespace-pre-wrap min-[480px]:whitespace-pre text-center">
         <span>Data from </span>
         <a target="_blank" href="https://data.gov/" class="underline">data.gov,</a>
-        <span> housed in Snowflake</span> | <span> Made by </span><a target="_blank" href="https://bradsiefert.com/" class="underline">this guy</a>
+        <span> served via Snowflake</span> | <span> Made by </span><a target="_blank" href="https://bradsiefert.com/" class="underline">this guy</a>
       </p>
     </div>
   </div>
