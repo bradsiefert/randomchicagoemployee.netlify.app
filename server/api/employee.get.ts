@@ -38,19 +38,20 @@ function executeQuery(connection: any, sqlText: string): Promise<any[]> {
 
 export default defineEventHandler(async (event) => {
   try {
-    // Get Snowflake credentials from environment variables
-    const account = process.env.SNOWFLAKE_ACCOUNT;
-    const username = process.env.SNOWFLAKE_USERNAME;
-    const password = process.env.SNOWFLAKE_PASSWORD;
-    const warehouse = process.env.SNOWFLAKE_WAREHOUSE;
-    const database = process.env.SNOWFLAKE_DATABASE;
-    const schema = process.env.SNOWFLAKE_SCHEMA;
+    // Get Snowflake credentials from runtime config (server-only, never exposed to client)
+    const config = useRuntimeConfig(event);
+    const account = config.private.snowflake.account;
+    const username = config.private.snowflake.username;
+    const password = config.private.snowflake.password;
+    const warehouse = config.private.snowflake.warehouse;
+    const database = config.private.snowflake.database;
+    const schema = config.private.snowflake.schema;
 
     // Validate required environment variables
     if (!account || !username || !password) {
       throw createError({
         statusCode: 500,
-        statusMessage: 'Missing required Snowflake credentials. Please check your .env file.',
+        statusMessage: 'Missing required Snowflake credentials. Please check your environment variables.',
       });
     }
 
