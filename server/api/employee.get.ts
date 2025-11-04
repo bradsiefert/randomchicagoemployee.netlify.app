@@ -39,37 +39,46 @@ function executeQuery(connection: any, sqlText: string): Promise<any[]> {
 export default defineEventHandler(async (event) => {
   try {
     // Get Snowflake credentials from runtime config (server-only, never exposed to client)
-    let config;
+    // Fallback to process.env if runtimeConfig doesn't work (e.g., in Netlify serverless functions)
+    let account: string | undefined;
+    let username: string | undefined;
+    let password: string | undefined;
+    let warehouse: string | undefined;
+    let database: string | undefined;
+    let schema: string | undefined;
+
     try {
-      config = useRuntimeConfig(event);
+      const config = useRuntimeConfig(event);
+      
+      // Try to get from runtimeConfig first
+      if (config?.private?.snowflake) {
+        account = config.private.snowflake.account;
+        username = config.private.snowflake.username;
+        password = config.private.snowflake.password;
+        warehouse = config.private.snowflake.warehouse;
+        database = config.private.snowflake.database;
+        schema = config.private.snowflake.schema;
+        console.log('Using runtimeConfig for Snowflake credentials');
+      } else {
+        console.warn('Runtime config structure invalid, falling back to process.env');
+      }
     } catch (configError: any) {
-      console.error('Failed to access runtime config:', configError);
-      throw createError({
-        statusCode: 500,
-        statusMessage: `Runtime config error: ${configError?.message || 'Unknown error'}`,
-      });
+      console.warn('Failed to access runtime config, falling back to process.env:', configError?.message);
     }
 
-    // Verify runtimeConfig structure
-    if (!config || !config.private || !config.private.snowflake) {
-      console.error('Runtime config structure:', {
-        hasConfig: !!config,
-        hasPrivate: !!config?.private,
-        hasSnowflake: !!config?.private?.snowflake,
-        configKeys: config ? Object.keys(config) : [],
-      });
-      throw createError({
-        statusCode: 500,
-        statusMessage: 'Runtime config structure is invalid. Check nuxt.config.ts configuration.',
-      });
+    // Fallback to process.env if runtimeConfig values are missing
+    if (!account || !username || !password) {
+      account = account || process.env.SNOWFLAKE_ACCOUNT;
+      username = username || process.env.SNOWFLAKE_USERNAME;
+      password = password || process.env.SNOWFLAKE_PASSWORD;
+      warehouse = warehouse || process.env.SNOWFLAKE_WAREHOUSE;
+      database = database || process.env.SNOWFLAKE_DATABASE;
+      schema = schema || process.env.SNOWFLAKE_SCHEMA;
+      
+      if (account || username || password) {
+        console.log('Using process.env for Snowflake credentials (fallback)');
+      }
     }
-
-    const account = config.private.snowflake.account;
-    const username = config.private.snowflake.username;
-    const password = config.private.snowflake.password;
-    const warehouse = config.private.snowflake.warehouse;
-    const database = config.private.snowflake.database;
-    const schema = config.private.snowflake.schema;
 
     // Log which variables are missing for debugging
     const missingVars: string[] = [];
