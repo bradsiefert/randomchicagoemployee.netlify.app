@@ -5,17 +5,3 @@
   # Nuxt build command is handled automatically by Netlify's Nuxt plugin
   # Command defaults to: npm run build
 
-[functions]
-  # Include snowflake-sdk and its dependencies in function bundle
-  included_files = ["node_modules/snowflake-sdk/**"]
-
-# Secret Scanning Configuration
-# Note: SECRETS_SCAN_ENABLED must be set as an environment variable in
-# Netlify's project settings (not in this file).
-#
-# To disable secret scanning entirely, add this environment variable in Netlify:
-#
-# SECRETS_SCAN_ENABLED=false
-#
-# See README.md for detailed instructions.
-
