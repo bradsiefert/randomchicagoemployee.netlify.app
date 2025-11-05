@@ -6,8 +6,8 @@
   # Command defaults to: npm run build
 
 [functions]
-  # Include snowflake-sdk in function bundle
-  external_node_modules = ["snowflake-sdk"]
+  # Include snowflake-sdk and its dependencies in function bundle
+  included_files = ["node_modules/snowflake-sdk/**"]
 
 # Secret Scanning Configuration
 # Note: SECRETS_SCAN_ENABLED must be set as an environment variable in

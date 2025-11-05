@@ -116,10 +116,10 @@ export default defineEventHandler(async (event) => {
     if (schema) connectionConfig.schema = schema;
 
     // Connect to Snowflake
+    console.log('Connecting to Snowflake...');
     const connection = await createConnection(connectionConfig);
 
     // Execute query to fetch one employee row
-    // Note: Update the table name and query as needed for your schema
     const sqlText = `
       SELECT * 
       FROM employees 
@@ -127,6 +127,7 @@ export default defineEventHandler(async (event) => {
       LIMIT 1
     `;
 
+    console.log('Executing query...');
     const rows = await executeQuery(connection, sqlText);
 
     // Close the connection
@@ -150,23 +151,38 @@ export default defineEventHandler(async (event) => {
     };
   } catch (error: any) {
     // Enhanced error logging for debugging
-    console.error('Snowflake API error details:', {
+    const errorDetails = {
       message: error.message,
       statusCode: error.statusCode,
       stack: error.stack,
       name: error.name,
-    });
+    };
+    
+    console.error('Snowflake API error details:', errorDetails);
+    
+    // In development, return more detailed error information
+    const isDev = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
     
     // If it's already a createError, preserve the status code
     if (error.statusCode) {
+      if (isDev) {
+        // Add more details in dev mode
+        throw createError({
+          statusCode: error.statusCode,
+          statusMessage: `${error.message}\n\nStack: ${error.stack || 'No stack trace'}`,
+        });
+      }
       throw error;
     }
     
     // Otherwise, wrap it in a createError
+    const errorMessage = isDev 
+      ? `${error.message || 'Failed to fetch employee data from Snowflake'}\n\nDetails: ${JSON.stringify(errorDetails, null, 2)}`
+      : error.message || 'Failed to fetch employee data from Snowflake';
+    
     throw createError({
       statusCode: error.statusCode || 500,
-      statusMessage: error.message || 'Failed to fetch employee data from Snowflake',
+      statusMessage: errorMessage,
     });
   }
 });
-
