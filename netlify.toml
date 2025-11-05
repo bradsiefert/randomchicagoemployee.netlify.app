@@ -6,8 +6,11 @@
   # Command defaults to: npm run build
 
 [functions]
-  # Include snowflake-sdk and its dependencies in function bundle
-  included_files = ["node_modules/snowflake-sdk/**"]
+  # Note: No SDK dependencies needed - using Snowflake SQL API (REST) instead
+
+[functions.employee-sql-api]
+  # Increase timeout for Snowflake SQL API calls (max 26s for free tier, 10s default)
+  timeout = 26
 
 # Secret Scanning Configuration
 # Note: SECRETS_SCAN_ENABLED must be set as an environment variable in
