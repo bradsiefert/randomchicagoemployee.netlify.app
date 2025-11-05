@@ -15,6 +15,14 @@ Start the development server:
 npm run dev
 ```
 
+Or use Netlify CLI for local development with function support:
+
+```bash
+netlify dev
+```
+
+**Note:** Use `netlify dev` (not `netlify serve`) for local development, as it properly handles Netlify Functions bundling.
+
 ## Production
 Build for production:
 

@@ -8,6 +8,15 @@
 [functions]
   # Include snowflake-sdk and its dependencies in function bundle
   included_files = ["node_modules/snowflake-sdk/**"]
+  
+  # Use zisi (default) bundler instead of esbuild
+  # zisi better handles CommonJS functions with package.json "type": "commonjs"
+  # esbuild was bundling as ES modules despite function's package.json
+  # node_bundler = "esbuild"  # Commented out - using default zisi
+
+[functions.employee]
+  # Increase timeout for Snowflake connection (max 26s for free tier, 10s default)
+  timeout = 26
 
 # Secret Scanning Configuration
 # Note: SECRETS_SCAN_ENABLED must be set as an environment variable in

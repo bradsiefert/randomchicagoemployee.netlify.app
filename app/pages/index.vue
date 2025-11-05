@@ -137,7 +137,8 @@ const fetchEmployee = async () => {
   error.value = null;
   
   try {
-    const response = await $fetch<{ success: boolean; data?: any }>('/api/employee');
+    // Use Netlify Function instead of Nuxt API route
+    const response = await $fetch<{ success: boolean; data?: any }>('/.netlify/functions/employee');
     
     if (response.success && response.data) {
       // Increment key to force transition
