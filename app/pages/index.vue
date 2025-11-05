@@ -8,7 +8,7 @@
     
     <div class="flex flex-col justify-center relative text-[#121212] text-xs min-[480px]:text-sm text-center tracking-[-0.3px] px-2 w-full">
       <p class="leading-5 min-[480px]:leading-6 text-base min-[480px]:text-lg whitespace-normal min-[480px]:whitespace-pre break-words">
-        Displays a random <a target="_blank" href="https://data.cityofchicago.org/" class="underline">City of Chicago</a> employee
+        Randomly displays 1 of the 32,381 <a target="_blank" href="https://data.cityofchicago.org/" class="underline">City of Chicago</a> employees
       </p>
     </div>
     <div class="flex gap-4 min-[480px]:gap-8 items-center justify-center relative w-full" data-name="card">
@@ -109,7 +109,7 @@
       <p class="leading-5 min-[480px]:leading-6 text-sm min-[480px]:text-lg whitespace-pre-wrap min-[480px]:whitespace-pre text-center">
         <span>Data from </span>
         <a target="_blank" href="https://data.gov/" class="underline">data.gov,</a>
-        <span> served via Snowflake</span> | <span> Made by </span><a target="_blank" href="https://bradsiefert.com/" class="underline">this guy</a>
+        <span> served via Supabase</span> | <span> Made by </span><a target="_blank" href="https://bradsiefert.com/" class="underline">this guy</a>
       </p>
     </div>
   </div>
@@ -140,6 +140,10 @@ const fetchEmployee = async () => {
     const response = await $fetch<{ success: boolean; data?: any }>('/api/employee');
     
     if (response.success && response.data) {
+      // Log the actual data structure for debugging
+      console.log('Employee data received:', response.data);
+      console.log('Available fields:', Object.keys(response.data));
+      
       // Increment key to force transition
       employeeKey.value++;
       // Update employee data - transition will trigger due to key change
@@ -234,7 +238,15 @@ const parseName = (fullName: string): { firstName: string; lastName: string } =>
 
 // Computed properties for employee data
 const fullName = computed(() => {
-  return getField(employee.value, 'NAME', 'name', 'FULL_NAME', 'fullName', 'EMPLOYEE_NAME', 'employeeName');
+  return getField(
+    employee.value,
+    // Uppercase variations
+    'NAME', 'FULL_NAME', 'EMPLOYEE_NAME', 'EMPLOYEE NAME',
+    // Lowercase variations
+    'name', 'full_name', 'fullName', 'employee_name', 'employeeName', 'employee name',
+    // Title case variations
+    'Name', 'Full Name', 'Employee Name', 'Full_Name', 'Employee_Name'
+  );
 });
 
 const nameParts = computed(() => {
@@ -260,21 +272,53 @@ const isLoadingData = computed(() => {
 });
 
 const jobTitle = computed(() => {
-  const title = getField(employee.value, 'JOB_TITLES', 'JOB_TITLE', 'jobTitle', 'JOBTITLE', 'job_title', 'TITLE', 'title');
+  const title = getField(
+    employee.value,
+    // Uppercase variations
+    'JOB_TITLES', 'JOB_TITLE', 'JOBTITLE', 'JOB TITLES', 'JOB TITLE', 'TITLE',
+    // Lowercase variations
+    'job_title', 'jobTitle', 'job_titles', 'jobTitles', 'job title', 'job titles', 'title',
+    // Title case variations
+    'Job Title', 'Job Titles', 'Job_Title', 'Job_Titles', 'Title'
+  );
   return properCase(title);
 });
 const department = computed(() => {
-  const dept = getField(employee.value, 'DEPARTMENT', 'department', 'DEPARTMENT_NAME', 'departmentName', 'department_name');
+  const dept = getField(
+    employee.value,
+    // Uppercase variations
+    'DEPARTMENT', 'DEPARTMENT_NAME', 'DEPT',
+    // Lowercase variations
+    'department', 'department_name', 'departmentName', 'dept',
+    // Title case variations
+    'Department', 'Department Name', 'Department_Name', 'Dept'
+  );
   return properCase(dept);
 });
 const salary = computed(() => {
-  const sal = employee.value?.ANNUAL_SALARY || employee.value?.SALARY || employee.value?.annualSalary || employee.value?.salary || employee.value?.annual_salary;
+  // Try all possible field name variations
+  const sal = employee.value?.ANNUAL_SALARY 
+    || employee.value?.SALARY 
+    || employee.value?.annualSalary 
+    || employee.value?.annual_salary
+    || employee.value?.salary
+    || employee.value?.['Annual Salary']
+    || employee.value?.['Annual_Salary']
+    || employee.value?.['Salary'];
   return formatSalary(sal);
 });
 
 // Check if employee is hourly
 const isHourly = computed(() => {
-  const salaryOrHourly = getField(employee.value, 'SALARY_OR_HOURLY', 'salaryOrHourly', 'salary_or_hourly');
+  const salaryOrHourly = getField(
+    employee.value,
+    // Uppercase variations
+    'SALARY_OR_HOURLY', 'SALARY OR HOURLY', 'TYPE',
+    // Lowercase variations
+    'salary_or_hourly', 'salaryOrHourly', 'salary or hourly', 'type',
+    // Title case variations
+    'Salary or Hourly', 'Salary_Or_Hourly', 'Type'
+  );
   if (salaryOrHourly) {
     const upperValue = salaryOrHourly.toUpperCase();
     return upperValue === 'HOURLY' || upperValue.includes('HOURLY');
@@ -295,13 +339,28 @@ const formatHourlyRate = (rate: number | string | null | undefined): string => {
 };
 
 const hourlyRate = computed(() => {
-  const rate = employee.value?.HOURLY_RATE || employee.value?.hourlyRate || employee.value?.hourly_rate || employee.value?.RATE || employee.value?.rate;
+  const rate = employee.value?.HOURLY_RATE 
+    || employee.value?.['HOURLY RATE']
+    || employee.value?.hourlyRate 
+    || employee.value?.hourly_rate
+    || employee.value?.RATE 
+    || employee.value?.rate
+    || employee.value?.['Hourly Rate']
+    || employee.value?.['Hourly_Rate'];
   return formatHourlyRate(rate);
 });
 
 const employeeType = computed(() => {
   // Check SALARY_OR_HOURLY first to determine if employee is salaried or hourly
-  const salaryOrHourly = getField(employee.value, 'SALARY_OR_HOURLY', 'salaryOrHourly', 'salary_or_hourly');
+  const salaryOrHourly = getField(
+    employee.value,
+    // Uppercase variations
+    'SALARY_OR_HOURLY', 'SALARY OR HOURLY', 'TYPE',
+    // Lowercase variations
+    'salary_or_hourly', 'salaryOrHourly', 'salary or hourly', 'type',
+    // Title case variations
+    'Salary or Hourly', 'Salary_Or_Hourly', 'Type'
+  );
   
   if (salaryOrHourly) {
     const upperValue = salaryOrHourly.toUpperCase();
@@ -314,13 +373,29 @@ const employeeType = computed(() => {
   }
   
   // Fallback to Full or Part-Time if SALARY_OR_HOURLY is not available
-  const fullOrPartTime = getField(employee.value, 'Full or Part-Time', 'fullOrPartTime', 'full_or_part_time', 'FULL_OR_PART_TIME');
+  const fullOrPartTime = getField(
+    employee.value,
+    // Uppercase variations
+    'FULL_OR_PART_TIME', 'FULL OR PART TIME', 'FULL_OR_PART-TIME',
+    // Lowercase variations
+    'full_or_part_time', 'fullOrPartTime', 'full or part-time', 'full or part time',
+    // Title case variations
+    'Full or Part-Time', 'Full_Or_Part_Time', 'Full or Part Time'
+  );
   if (fullOrPartTime) {
     return fullOrPartTime === 'F' ? 'Full-Time' : fullOrPartTime === 'P' ? 'Part-Time' : properCase(fullOrPartTime);
   }
   
   // Final fallback to other possible field names
-  const type = getField(employee.value, 'EMPLOYEE_TYPE', 'employeeType', 'EMPLOYEE_TYPE_NAME', 'employeeTypeName', 'employee_type');
+  const type = getField(
+    employee.value,
+    // Uppercase variations
+    'EMPLOYEE_TYPE', 'EMPLOYEE_TYPE_NAME', 'EMPLOYEE TYPE',
+    // Lowercase variations
+    'employee_type', 'employeeType', 'employee_type_name', 'employeeTypeName', 'employee type',
+    // Title case variations
+    'Employee Type', 'Employee_Type', 'Employee Type Name', 'Employee_Type_Name'
+  );
   return properCase(type);
 });
 
