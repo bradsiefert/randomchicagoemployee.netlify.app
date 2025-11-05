@@ -55,6 +55,7 @@ export default defineEventHandler(async (event) => {
     console.log(`Fetching random employee at offset ${randomOffset} of ${count} total employees...`);
 
     // Query to fetch one random employee row
+    console.log('Querying City of Chicago Employees table...');
     const { data, error } = await supabase
       .from('City of Chicago Employees')
       .select('*')
@@ -77,7 +78,10 @@ export default defineEventHandler(async (event) => {
     }
 
     if (!data || data.length === 0) {
-      console.warn('Query returned no data at random offset');
+      console.warn('Query returned no data. This could mean:');
+      console.warn('1. The table is empty');
+      console.warn('2. Row Level Security (RLS) policies are blocking access');
+      console.warn('3. The query syntax needs adjustment');
       throw createError({
         statusCode: 404,
         statusMessage: 'No employee data found. Check if the table has data and RLS policies allow access.',
@@ -86,7 +90,7 @@ export default defineEventHandler(async (event) => {
 
     console.log('Query executed successfully, random employee fetched');
 
-    // Return the employee in same format as existing API
+    // Return the random employee in same format as existing employee API
     return {
       success: true,
       data: data[0],
@@ -128,3 +132,4 @@ export default defineEventHandler(async (event) => {
     });
   }
 });
+
