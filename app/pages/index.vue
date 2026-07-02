@@ -1,12 +1,74 @@
 <template>
-  <div class="bg-zinc-100 flex flex-col gap-4 min-[480px]:gap-6 items-center justify-center p-2 relative min-h-screen">
+  <div
+    class="flex flex-col gap-4 min-[480px]:gap-6 items-center justify-center p-2 relative min-h-screen transition-colors duration-300"
+    :class="isDark ? 'bg-zinc-900' : 'bg-zinc-100'"
+  >
+    <!-- Theme toggle -->
+    <div
+      class="theme-segment fixed top-3 right-3 z-10"
+      role="group"
+      aria-label="Color theme"
+    >
+      <div
+        class="theme-segment-track relative grid grid-cols-2 rounded-full p-1 shadow-sm transition-colors duration-300"
+        :class="isDark
+          ? 'bg-zinc-950/80 ring-1 ring-zinc-700/80 shadow-black/20'
+          : 'bg-white/80 ring-1 ring-zinc-200/90 shadow-zinc-300/30 backdrop-blur-sm'"
+      >
+        <span
+          class="theme-segment-thumb absolute top-1 bottom-1 left-1 w-[calc(50%-0.25rem)] rounded-full transition-transform duration-300 ease-[cubic-bezier(0.34,1.2,0.64,1)]"
+          :class="[
+            theme === 'dark' ? 'translate-x-full' : 'translate-x-0',
+            isDark ? 'bg-zinc-700 shadow-md shadow-black/30' : 'bg-zinc-100 shadow-sm'
+          ]"
+          aria-hidden="true"
+        />
+        <button
+          type="button"
+          class="theme-segment-button relative z-10 flex items-center justify-center gap-1.5 rounded-full px-3 py-1.5 min-[480px]:px-3.5 min-[480px]:py-2 transition-colors duration-200"
+          :class="theme === 'light'
+            ? (isDark ? 'text-white' : 'text-zinc-950')
+            : (isDark ? 'text-zinc-300 hover:text-zinc-100' : 'text-zinc-600 hover:text-zinc-900')"
+          :aria-pressed="theme === 'light'"
+          @click="setTheme('light')"
+        >
+          <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+          </svg>
+          <span class="text-xs font-semibold tracking-wide min-[480px]:text-sm">Light</span>
+        </button>
+        <button
+          type="button"
+          class="theme-segment-button relative z-10 flex items-center justify-center gap-1.5 rounded-full px-3 py-1.5 min-[480px]:px-3.5 min-[480px]:py-2 transition-colors duration-200"
+          :class="theme === 'dark'
+            ? (isDark ? 'text-white' : 'text-zinc-950')
+            : (isDark ? 'text-zinc-300 hover:text-zinc-100' : 'text-zinc-600 hover:text-zinc-900')"
+          :aria-pressed="theme === 'dark'"
+          @click="setTheme('dark')"
+        >
+          <svg class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          </svg>
+          <span class="text-xs font-semibold tracking-wide min-[480px]:text-sm">Dark</span>
+        </button>
+      </div>
+    </div>
+
     <!-- Error message display -->
-    <div v-if="error" class="w-full max-w-[calc(100%-1rem)] min-[480px]:w-[448px] bg-red-50 border border-red-200 rounded-md p-4 mb-4">
-      <p class="text-red-800 font-semibold mb-2">Error loading employee data</p>
-      <p class="text-red-700 text-sm">{{ error }}</p>
+    <div
+      v-if="error"
+      class="w-full max-w-[calc(100%-1rem)] min-[480px]:w-[448px] rounded-md p-4 mb-4 transition-colors duration-300"
+      :class="isDark ? 'bg-red-950 border border-red-800' : 'bg-red-50 border border-red-200'"
+    >
+      <p class="font-semibold mb-2" :class="isDark ? 'text-red-200' : 'text-red-800'">Error loading employee data</p>
+      <p class="text-sm" :class="isDark ? 'text-red-300' : 'text-red-700'">{{ error }}</p>
     </div>
     
-    <div class="flex flex-col justify-center relative text-[#121212] text-xs min-[480px]:text-sm text-center tracking-[-0.3px] px-2 w-full">
+    <div
+      class="flex flex-col justify-center relative text-xs min-[480px]:text-sm text-center tracking-[-0.3px] px-2 w-full transition-colors duration-300"
+      :class="isDark ? 'text-zinc-100' : 'text-[#121212]'"
+    >
       <p class="leading-5 min-[480px]:leading-6 text-base min-[480px]:text-lg whitespace-normal min-[480px]:whitespace-pre break-words">
         Randomly displays 1 of the {{ formattedEmployeeCount }} <a target="_blank" href="https://data.cityofchicago.org/" class="underline">City of Chicago</a> employees
       </p>
@@ -14,20 +76,32 @@
     <div class="flex gap-4 min-[480px]:gap-8 items-center justify-center relative w-full" data-name="card">
       <div class="card-container w-full max-w-[calc(100%-1rem)] min-[480px]:w-[448px] h-64" :class="{ 'flipped': isFlipped }">
         <div class="card-front">
-          <div class="bg-white border border-gray-300 relative rounded-md w-full h-full" data-name="business-card-front">
+          <div
+            class="border relative rounded-md w-full h-full transition-colors duration-300"
+            :class="isDark ? 'bg-zinc-800 border-zinc-600' : 'bg-white border-gray-300'"
+            data-name="business-card-front"
+          >
             <div class="h-full shadow-md overflow-clip relative rounded-[inherit] w-full">
               <!-- Loading state: show only loading indicator -->
               <template v-if="!isNameReady">
-                <div class="absolute flex flex-col gap-1.5 min-[480px]:gap-2 items-start left-20 min-[480px]:left-[127px] text-[#121212] top-1/2 translate-y-[-50%] right-12 min-[480px]:right-auto" data-name="name+role">
+                <div
+                  class="absolute flex flex-col gap-1.5 min-[480px]:gap-2 items-start left-20 min-[480px]:left-[127px] top-1/2 translate-y-[-50%] right-12 min-[480px]:right-auto transition-colors duration-300"
+                  :class="isDark ? 'text-zinc-100' : 'text-[#121212]'"
+                  data-name="name+role"
+                >
                   <div class="flex flex-col employee-name font-extrabold justify-center relative tracking-[-0.2px] w-full">
-                    <p class="leading-7 min-[480px]:leading-[29px] text-3xl min-[480px]:text-4xl text-gray-400 animate-pulse">Loading...</p>
+                    <p class="leading-7 min-[480px]:leading-[29px] text-3xl min-[480px]:text-4xl animate-pulse" :class="isDark ? 'text-zinc-500' : 'text-gray-400'">Loading...</p>
                   </div>
                 </div>
               </template>
               
               <!-- Data ready: show all fields together -->
               <template v-else>
-                <div class="absolute flex flex-col gap-1.5 min-[480px]:gap-2 items-start left-20 min-[480px]:left-[127px] text-[#121212] top-1/2 translate-y-[-50%] right-12 min-[480px]:right-auto" data-name="name+role">
+                <div
+                  class="absolute flex flex-col gap-1.5 min-[480px]:gap-2 items-start left-20 min-[480px]:left-[127px] top-1/2 translate-y-[-50%] right-12 min-[480px]:right-auto transition-colors duration-300"
+                  :class="isDark ? 'text-zinc-100' : 'text-[#121212]'"
+                  data-name="name+role"
+                >
                   <div class="flex flex-col employee-name font-extrabold justify-center relative tracking-[-0.2px] w-full">
                     <Transition name="fade" mode="out-in">
                       <p :key="`name-${employeeKey}`" class="leading-7 min-[480px]:leading-[29px] text-3xl min-[480px]:text-4xl">
@@ -43,7 +117,11 @@
                     </Transition>
                   </div>
                 </div>
-                <div class="absolute bottom-4 min-[480px]:bottom-6 capitalize flex flex-col font-medium justify-end left-20 min-[480px]:left-[127px] text-[#121212] text-base min-[480px]:text-lg tracking-[-0.3px] right-12 min-[480px]:right-auto min-[480px]:w-[305px]" data-name="department">
+                <div
+                  class="absolute bottom-4 min-[480px]:bottom-6 capitalize flex flex-col font-medium justify-end left-20 min-[480px]:left-[127px] text-base min-[480px]:text-lg tracking-[-0.3px] right-12 min-[480px]:right-auto min-[480px]:w-[305px] transition-colors duration-300"
+                  :class="isDark ? 'text-zinc-100' : 'text-[#121212]'"
+                  data-name="department"
+                >
                   <Transition name="fade" mode="out-in">
                     <p v-if="department" :key="`dept-${employeeKey}`" class="leading-5 min-[480px]:leading-6 mb-0">{{ department }}</p>
                   </Transition>
@@ -51,34 +129,54 @@
               </template>
               
               <div class="absolute h-32 min-[480px]:h-[208px] left-4 min-[480px]:left-6 top-1/2 translate-y-[-50%] w-12 min-[480px]:w-[71px]" data-name="CHI-vertical">
-                <img alt="City of Chicago Logo" class="absolute inset-0 object-center object-contain size-full" :src="imgChiVertical" />
+                <img alt="City of Chicago Logo" class="absolute inset-0 object-center object-contain size-full transition-[filter] duration-300" :class="isDark ? 'brightness-0 invert' : ''" :src="imgChiVertical" />
               </div>
               <div class="absolute right-3 min-[480px]:right-4 top-3 min-[480px]:top-4 flex gap-2 items-center">
-                <div class="size-8 min-[480px]:size-9 cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 hover:bg-gray-100 active:bg-gray-200 rounded-lg p-1" @click="refreshEmployee" data-name="UserSwitch">
-                  <img alt="Change user" class="block size-full transition-opacity duration-300 hover:opacity-80 active:opacity-60" :src="imgUserSwitch" />
+                <div
+                  class="size-8 min-[480px]:size-9 cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 rounded-lg p-1"
+                  :class="isDark ? 'hover:bg-zinc-700 active:bg-zinc-600' : 'hover:bg-gray-100 active:bg-gray-200'"
+                  @click="refreshEmployee"
+                  data-name="UserSwitch"
+                >
+                  <img alt="Change user" class="block size-full transition-opacity duration-300 hover:opacity-80 active:opacity-60" :class="{ invert: isDark }" :src="imgUserSwitch" />
                 </div>
-                <div class="size-8 min-[480px]:size-9 cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 hover:rotate-180 hover:bg-gray-100 active:bg-gray-200 rounded-lg p-1" @click="toggleFlip" data-name="ArrowsCounterClockwise">
-                  <img alt="Refresh" class="block size-full transition-opacity duration-300 hover:opacity-80 active:opacity-60" :src="imgArrowsCounterClockwise" />
+                <div
+                  class="size-8 min-[480px]:size-9 cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 hover:rotate-180 rounded-lg p-1"
+                  :class="isDark ? 'hover:bg-zinc-700 active:bg-zinc-600' : 'hover:bg-gray-100 active:bg-gray-200'"
+                  @click="toggleFlip"
+                  data-name="ArrowsCounterClockwise"
+                >
+                  <img alt="Refresh" class="block size-full transition-opacity duration-300 hover:opacity-80 active:opacity-60" :class="{ invert: isDark }" :src="imgArrowsCounterClockwise" />
                 </div>
               </div>
             </div>
           </div>
         </div>
         <div class="card-back">
-          <div class="bg-white border border-gray-300 shadow-md relative rounded-md w-full h-full" data-name="business-card-back">
+          <div
+            class="border shadow-md relative rounded-md w-full h-full transition-colors duration-300"
+            :class="isDark ? 'bg-zinc-800 border-zinc-600' : 'bg-white border-gray-300'"
+            data-name="business-card-back"
+          >
             <div class="h-full overflow-clip relative rounded-[inherit] w-full flex items-center justify-center">
               <div v-if="isFlipped && isNameReady" class="flex flex-col gap-4 items-center relative max-w-[255px] min-[480px]:max-w-none">
                 <div class="flex flex-col employee-name font-extrabold justify-center relative text-[#e71a40] text-5xl min-[480px]:text-[72px] text-center tracking-tight">
                   <p class="leading-[1.2]">✶✶✶✶</p>
                 </div>
-                <div class="flex flex-col employee-name font-extrabold justify-center relative text-[#121212] text-3xl min-[480px]:text-4xl text-center tracking-[-0.2px]">
+                <div
+                  class="flex flex-col employee-name font-extrabold justify-center relative text-3xl min-[480px]:text-4xl text-center tracking-[-0.2px] transition-colors duration-300"
+                  :class="isDark ? 'text-zinc-100' : 'text-[#121212]'"
+                >
                   <Transition name="fade" mode="out-in">
                     <p v-if="firstName && lastName" :key="`name-back-${employeeKey}`" class="leading-[29px]">
                       <span class="employee-name font-extrabold">{{ firstName }}</span> <span class="employee-name font-medium">{{ lastName }}</span>
                     </p>
                   </Transition>
                 </div>
-                <div class="capitalize flex flex-col gap-1 items-center justify-center relative text-[#121212] text-base tracking-[-0.3px]">
+                <div
+                  class="capitalize flex flex-col gap-1 items-center justify-center relative text-base tracking-[-0.3px] transition-colors duration-300"
+                  :class="isDark ? 'text-zinc-100' : 'text-[#121212]'"
+                >
                   <Transition name="fade" mode="out-in">
                     <div v-if="employeeType" :key="`type-${employeeKey}`">
                       <p class="leading-5 whitespace-pre">{{ employeeType }}</p>
@@ -96,8 +194,13 @@
                 </div>
               </div>
               <div class="absolute right-3 min-[480px]:right-4 top-3 min-[480px]:top-4 flex gap-2 items-center">
-                <div class="size-8 min-[480px]:size-9 cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 hover:rotate-180 hover:bg-gray-100 active:bg-gray-200 rounded-lg p-1" @click="toggleFlip" data-name="ArrowsCounterClockwise">
-                  <img alt="Refresh" class="block size-full transition-opacity duration-300 hover:opacity-80 active:opacity-60" :src="imgArrowsCounterClockwise" />
+                <div
+                  class="size-8 min-[480px]:size-9 cursor-pointer transition-all duration-300 hover:scale-110 active:scale-95 hover:rotate-180 rounded-lg p-1"
+                  :class="isDark ? 'hover:bg-zinc-700 active:bg-zinc-600' : 'hover:bg-gray-100 active:bg-gray-200'"
+                  @click="toggleFlip"
+                  data-name="ArrowsCounterClockwise"
+                >
+                  <img alt="Refresh" class="block size-full transition-opacity duration-300 hover:opacity-80 active:opacity-60" :class="{ invert: isDark }" :src="imgArrowsCounterClockwise" />
                 </div>
               </div>
             </div>
@@ -105,11 +208,17 @@
         </div>
       </div>
     </div>
-    <div class="flex flex-col justify-center relative text-[#121212] tracking-[-0.3px] px-2">
+    <div
+      class="flex flex-col text-center relative tracking-[-0.3px] px-2 transition-colors duration-300"
+      :class="isDark ? 'text-zinc-100' : 'text-[#121212]'"
+    >
       <p class="leading-5 min-[480px]:leading-6 text-sm min-[480px]:text-lg whitespace-pre-wrap min-[480px]:whitespace-pre text-center">
         <span>Data from </span>
         <a target="_blank" href="https://data.gov/" class="underline">data.gov,</a>
         <span> served via Convex</span> | <span> Made by </span><a target="_blank" href="https://bradsiefert.com/" class="underline">this guy</a>
+      </p>
+      <p class="leading-5 min-[480px]:leading-6 text-base min-[480px]:text-lg whitespace-normal min-[480px]:whitespace-pre break-words">
+        Last updated: July 1, 2026
       </p>
     </div>
   </div>
@@ -120,6 +229,7 @@ import { ref, onMounted, computed, nextTick } from 'vue';
 import { useConvexClient } from 'convex-vue';
 import { api } from '../../convex/_generated/api';
 
+const { theme, isDark, setTheme } = useTheme();
 const convex = useConvexClient();
 
 const imgChiVertical = "/chicago-logo-vertical.png";
@@ -415,6 +525,18 @@ onMounted(async () => {
 <style lang="css" scoped>
   .employee-name {
     font-family: "Big Shoulders Display", sans-serif;
+  }
+
+  .theme-segment-track {
+    min-width: 9.25rem;
+  }
+
+  .theme-segment-button:active {
+    transform: scale(0.97);
+  }
+
+  .theme-segment-button {
+    transition: color 0.2s ease, transform 0.15s ease;
   }
 
   .card-container {

@@ -15,7 +15,13 @@ useHead({
 
 <style lang="css">
   html {
+    color-scheme: light dark;
     background-color: rgb(244 244 245);
+    transition: background-color 0.3s ease;
+  }
+
+  html[data-theme='dark'] {
+    background-color: rgb(24 24 27);
   }
 
   body {
