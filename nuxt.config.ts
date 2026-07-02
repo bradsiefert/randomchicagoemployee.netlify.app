@@ -2,7 +2,10 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: false },
-  modules: ['@nuxtjs/tailwindcss'],
+  modules: ['@nuxtjs/tailwindcss', 'convex-nuxt'],
+  convex: {
+    url: process.env.CONVEX_URL,
+  },
   app: {
     head: {
       meta: [

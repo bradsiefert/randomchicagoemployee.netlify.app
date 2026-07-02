@@ -8,7 +8,7 @@
     
     <div class="flex flex-col justify-center relative text-[#121212] text-xs min-[480px]:text-sm text-center tracking-[-0.3px] px-2 w-full">
       <p class="leading-5 min-[480px]:leading-6 text-base min-[480px]:text-lg whitespace-normal min-[480px]:whitespace-pre break-words">
-        Randomly displays 1 of the 32,381 <a target="_blank" href="https://data.cityofchicago.org/" class="underline">City of Chicago</a> employees
+        Randomly displays 1 of the {{ formattedEmployeeCount }} <a target="_blank" href="https://data.cityofchicago.org/" class="underline">City of Chicago</a> employees
       </p>
     </div>
     <div class="flex gap-4 min-[480px]:gap-8 items-center justify-center relative w-full" data-name="card">
@@ -109,7 +109,7 @@
       <p class="leading-5 min-[480px]:leading-6 text-sm min-[480px]:text-lg whitespace-pre-wrap min-[480px]:whitespace-pre text-center">
         <span>Data from </span>
         <a target="_blank" href="https://data.gov/" class="underline">data.gov,</a>
-        <span> served via Supabase</span> | <span> Made by </span><a target="_blank" href="https://bradsiefert.com/" class="underline">this guy</a>
+        <span> served via Convex</span> | <span> Made by </span><a target="_blank" href="https://bradsiefert.com/" class="underline">this guy</a>
       </p>
     </div>
   </div>
@@ -117,6 +117,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed, nextTick } from 'vue';
+import { useConvexClient } from 'convex-vue';
+import { api } from '../../convex/_generated/api';
+
+const convex = useConvexClient();
 
 const imgChiVertical = "/chicago-logo-vertical.png";
 const imgArrowsCounterClockwise = "/ArrowsCounterClockwise.svg";
@@ -127,6 +131,13 @@ const employee = ref<any>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
 const employeeKey = ref(0); // Used to force transitions on data updates
+const employeeCount = ref(0);
+
+const formattedEmployeeCount = computed(() => {
+  return employeeCount.value > 0
+    ? employeeCount.value.toLocaleString('en-US')
+    : '32,381';
+});
 
 const toggleFlip = () => {
   isFlipped.value = !isFlipped.value;
@@ -137,32 +148,24 @@ const fetchEmployee = async () => {
   error.value = null;
   
   try {
-    const response = await $fetch<{ success: boolean; data?: any }>('/api/employee');
+    const data = await convex.query(api.employees.random, {
+      seed: Math.random(),
+    });
     
-    if (response.success && response.data) {
-      // Log the actual data structure for debugging
-      console.log('Employee data received:', response.data);
-      console.log('Available fields:', Object.keys(response.data));
-      
-      // Increment key to force transition
+    if (data) {
       employeeKey.value++;
-      // Update employee data - transition will trigger due to key change
-      employee.value = response.data;
-      // Reset flip state when new employee is loaded
+      employee.value = data;
       isFlipped.value = false;
       
-      // Wait for Vue to update computed properties and ensure name is ready
       await nextTick();
       
-      // Keep loading true until name is ready
-      // Poll briefly to ensure name computed properties have evaluated
       let attempts = 0;
       while (!isNameReady.value && attempts < 10) {
         await new Promise(resolve => setTimeout(resolve, 10));
         attempts++;
       }
     } else {
-      error.value = 'No employee data returned from API';
+      error.value = 'No employee data returned from Convex';
     }
   } catch (err: any) {
     error.value = err.message || 'Failed to fetch employee data';
@@ -399,7 +402,12 @@ const employeeType = computed(() => {
   return properCase(type);
 });
 
-onMounted(() => {
+onMounted(async () => {
+  try {
+    employeeCount.value = await convex.query(api.employees.count);
+  } catch (err) {
+    console.error('Error fetching employee count:', err);
+  }
   fetchEmployee();
 });
 </script>

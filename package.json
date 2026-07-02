@@ -3,15 +3,17 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
+    "build": "nuxt build --dotenv .env.local",
+    "dev": "nuxt dev --dotenv .env.local",
     "generate": "nuxt generate",
-    "preview": "nuxt preview",
+    "preview": "nuxt preview --dotenv .env.local",
+    "serve": "npx netlify serve",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
     "@nuxt/fonts": "^0.11.4",
-    "@supabase/supabase-js": "^2.79.0",
+    "convex": "^1.42.1",
+    "convex-nuxt": "^0.1.5",
     "nuxt": "^4.2.0",
     "vue": "^3.5.22",
     "vue-router": "^4.6.3"
