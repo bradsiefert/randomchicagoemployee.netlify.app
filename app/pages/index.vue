@@ -1,7 +1,7 @@
 <template>
   <div
-    class="flex flex-col gap-4 min-[480px]:gap-6 items-center justify-center p-2 relative min-h-screen transition-colors duration-300"
-    :class="isDark ? 'bg-zinc-900' : 'bg-zinc-100'"
+    class="page-root flex flex-col gap-4 min-[480px]:gap-6 items-center justify-center p-2 relative min-h-screen transition-colors duration-300"
+    :class="[isDark ? 'bg-zinc-900' : 'bg-zinc-100', { 'page-ready': themeReady }]"
   >
     <!-- Theme toggle -->
     <div
@@ -16,9 +16,10 @@
           : 'bg-white/80 ring-1 ring-zinc-200/90 shadow-zinc-300/30 backdrop-blur-sm'"
       >
         <span
-          class="theme-segment-thumb absolute top-1 bottom-1 left-1 w-[calc(50%-0.25rem)] rounded-full transition-transform duration-300 ease-[cubic-bezier(0.34,1.2,0.64,1)]"
+          class="theme-segment-thumb absolute top-1 bottom-1 left-1 w-[calc(50%-0.25rem)] rounded-full"
           :class="[
             theme === 'dark' ? 'translate-x-full' : 'translate-x-0',
+            themeReady ? 'transition-transform duration-300 ease-[cubic-bezier(0.34,1.2,0.64,1)]' : '',
             isDark ? 'bg-zinc-700 shadow-md shadow-black/30' : 'bg-zinc-100 shadow-sm'
           ]"
           aria-hidden="true"
@@ -74,7 +75,7 @@
       </p>
     </div>
     <div class="flex gap-4 min-[480px]:gap-8 items-center justify-center relative w-full" data-name="card">
-      <div class="card-container w-full max-w-[calc(100%-1rem)] min-[480px]:w-[448px] h-64" :class="{ 'flipped': isFlipped }">
+      <div class="card-container w-full max-w-[calc(100%-1rem)] min-[480px]:w-[448px] h-64" :class="{ flipped: isFlipped, 'card-ready': cardReady }">
         <div class="card-front">
           <div
             class="border relative rounded-md w-full h-full transition-colors duration-300"
@@ -82,28 +83,24 @@
             data-name="business-card-front"
           >
             <div class="h-full shadow-md overflow-clip relative rounded-[inherit] w-full">
-              <!-- Loading state: show only loading indicator -->
-              <template v-if="!isNameReady">
+              <div
+                class="absolute flex flex-col gap-1.5 min-[480px]:gap-2 items-start left-20 min-[480px]:left-[127px] top-1/2 translate-y-[-50%] right-12 min-[480px]:right-auto transition-colors duration-300"
+                :class="isDark ? 'text-zinc-100' : 'text-[#121212]'"
+                data-name="name+role"
+              >
                 <div
-                  class="absolute flex flex-col gap-1.5 min-[480px]:gap-2 items-start left-20 min-[480px]:left-[127px] top-1/2 translate-y-[-50%] right-12 min-[480px]:right-auto transition-colors duration-300"
-                  :class="isDark ? 'text-zinc-100' : 'text-[#121212]'"
-                  data-name="name+role"
+                  class="flex flex-col employee-name font-extrabold justify-center relative tracking-[-0.2px] w-full transition-opacity duration-200"
+                  :class="isNameReady ? 'opacity-0' : 'opacity-100'"
+                  aria-hidden="isNameReady"
                 >
-                  <div class="flex flex-col employee-name font-extrabold justify-center relative tracking-[-0.2px] w-full">
-                    <p class="leading-7 min-[480px]:leading-[29px] text-3xl min-[480px]:text-4xl animate-pulse" :class="isDark ? 'text-zinc-500' : 'text-gray-400'">Loading...</p>
-                  </div>
+                  <p class="leading-7 min-[480px]:leading-[29px] text-3xl min-[480px]:text-4xl animate-pulse" :class="isDark ? 'text-zinc-500' : 'text-gray-400'">Loading...</p>
                 </div>
-              </template>
-              
-              <!-- Data ready: show all fields together -->
-              <template v-else>
                 <div
-                  class="absolute flex flex-col gap-1.5 min-[480px]:gap-2 items-start left-20 min-[480px]:left-[127px] top-1/2 translate-y-[-50%] right-12 min-[480px]:right-auto transition-colors duration-300"
-                  :class="isDark ? 'text-zinc-100' : 'text-[#121212]'"
-                  data-name="name+role"
+                  class="flex flex-col gap-1.5 min-[480px]:gap-2 transition-opacity duration-200"
+                  :class="isNameReady ? 'opacity-100' : 'opacity-0 pointer-events-none absolute inset-0'"
                 >
                   <div class="flex flex-col employee-name font-extrabold justify-center relative tracking-[-0.2px] w-full">
-                    <Transition name="fade" mode="out-in">
+                    <Transition name="fade" mode="out-in" :disabled="!animateEmployeeData">
                       <p :key="`name-${employeeKey}`" class="leading-7 min-[480px]:leading-[29px] text-3xl min-[480px]:text-4xl">
                         <span v-if="firstName" class="employee-name font-extrabold">{{ firstName }}</span>
                         <span v-if="firstName && lastName">&nbsp;</span>
@@ -112,21 +109,24 @@
                     </Transition>
                   </div>
                   <div class="capitalize flex flex-col italic justify-center relative text-lg tracking-[-0.3px] w-full">
-                    <Transition name="fade" mode="out-in">
+                    <Transition name="fade" mode="out-in" :disabled="!animateEmployeeData">
                       <p v-if="jobTitle" :key="`title-${employeeKey}`" class="leading-5 min-[480px]:leading-6">{{ jobTitle }}</p>
                     </Transition>
                   </div>
                 </div>
-                <div
-                  class="absolute bottom-4 min-[480px]:bottom-6 capitalize flex flex-col font-medium justify-end left-20 min-[480px]:left-[127px] text-base min-[480px]:text-lg tracking-[-0.3px] right-12 min-[480px]:right-auto min-[480px]:w-[305px] transition-colors duration-300"
-                  :class="isDark ? 'text-zinc-100' : 'text-[#121212]'"
-                  data-name="department"
-                >
-                  <Transition name="fade" mode="out-in">
-                    <p v-if="department" :key="`dept-${employeeKey}`" class="leading-5 min-[480px]:leading-6 mb-0">{{ department }}</p>
-                  </Transition>
-                </div>
-              </template>
+              </div>
+              <div
+                class="absolute bottom-4 min-[480px]:bottom-6 capitalize flex flex-col font-medium justify-end left-20 min-[480px]:left-[127px] text-base min-[480px]:text-lg tracking-[-0.3px] right-12 min-[480px]:right-auto min-[480px]:w-[305px] transition-opacity duration-200"
+                :class="[
+                  isDark ? 'text-zinc-100' : 'text-[#121212]',
+                  isNameReady ? 'opacity-100' : 'opacity-0'
+                ]"
+                data-name="department"
+              >
+                <Transition name="fade" mode="out-in" :disabled="!animateEmployeeData">
+                  <p v-if="department" :key="`dept-${employeeKey}`" class="leading-5 min-[480px]:leading-6 mb-0">{{ department }}</p>
+                </Transition>
+              </div>
               
               <div class="absolute h-32 min-[480px]:h-[208px] left-4 min-[480px]:left-6 top-1/2 translate-y-[-50%] w-12 min-[480px]:w-[71px]" data-name="CHI-vertical">
                 <img alt="City of Chicago Logo" class="absolute inset-0 object-center object-contain size-full transition-[filter] duration-300" :class="isDark ? 'brightness-0 invert' : ''" :src="imgChiVertical" />
@@ -167,7 +167,7 @@
                   class="flex flex-col employee-name font-extrabold justify-center relative text-3xl min-[480px]:text-4xl text-center tracking-[-0.2px] transition-colors duration-300"
                   :class="isDark ? 'text-zinc-100' : 'text-[#121212]'"
                 >
-                  <Transition name="fade" mode="out-in">
+                  <Transition name="fade" mode="out-in" :disabled="!animateEmployeeData">
                     <p v-if="firstName && lastName" :key="`name-back-${employeeKey}`" class="leading-[29px]">
                       <span class="employee-name font-extrabold">{{ firstName }}</span> <span class="employee-name font-medium">{{ lastName }}</span>
                     </p>
@@ -177,12 +177,12 @@
                   class="capitalize flex flex-col gap-1 items-center justify-center relative text-base tracking-[-0.3px] transition-colors duration-300"
                   :class="isDark ? 'text-zinc-100' : 'text-[#121212]'"
                 >
-                  <Transition name="fade" mode="out-in">
+                  <Transition name="fade" mode="out-in" :disabled="!animateEmployeeData">
                     <div v-if="employeeType" :key="`type-${employeeKey}`">
                       <p class="leading-5 whitespace-pre">{{ employeeType }}</p>
                     </div>
                   </Transition>
-                  <Transition name="fade" mode="out-in">
+                  <Transition name="fade" mode="out-in" :disabled="!animateEmployeeData">
                     <div v-if="isHourly ? hourlyRate : salary" :key="`compensation-${employeeKey}`">
                       <p class="leading-5 whitespace-pre">
                         <span v-if="isHourly">Hourly Rate:</span>
@@ -240,7 +240,10 @@ const isFlipped = ref(false);
 const employee = ref<any>(null);
 const loading = ref(true);
 const error = ref<string | null>(null);
-const employeeKey = ref(0); // Used to force transitions on data updates
+const employeeKey = ref(0);
+const animateEmployeeData = ref(false);
+const themeReady = ref(false);
+const cardReady = ref(false); // Used to force transitions on data updates
 const employeeCount = ref(0);
 
 const formattedEmployeeCount = computed(() => {
@@ -263,6 +266,9 @@ const fetchEmployee = async () => {
     });
     
     if (data) {
+      if (employee.value) {
+        animateEmployeeData.value = true;
+      }
       employeeKey.value++;
       employee.value = data;
       isFlipped.value = false;
@@ -513,6 +519,11 @@ const employeeType = computed(() => {
 });
 
 onMounted(async () => {
+  await nextTick();
+  themeReady.value = true;
+  cardReady.value = true;
+  document.documentElement.classList.add('page-ready');
+
   try {
     employeeCount.value = await convex.query(api.employees.count);
   } catch (err) {
@@ -523,6 +534,11 @@ onMounted(async () => {
 </script>
 
 <style lang="css" scoped>
+  .page-root:not(.page-ready),
+  .page-root:not(.page-ready) :deep(*) {
+    transition-property: none !important;
+  }
+
   .employee-name {
     font-family: "Big Shoulders Display", sans-serif;
   }
@@ -550,8 +566,12 @@ onMounted(async () => {
     width: 100%;
     height: 100%;
     backface-visibility: hidden;
-    transition: transform 0.8s;
     transform-style: preserve-3d;
+  }
+
+  .card-container.card-ready .card-front,
+  .card-container.card-ready .card-back {
+    transition: transform 0.8s;
   }
 
   .card-front {
@@ -582,6 +602,11 @@ onMounted(async () => {
   .fade-enter-from {
     opacity: 0;
     transform: translateY(-4px);
+  }
+
+  .fade-enter-to {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   .fade-leave-to {

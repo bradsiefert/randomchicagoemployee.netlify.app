@@ -15,8 +15,14 @@ export default defineNuxtConfig({
     head: {
       script: [
         {
-          innerHTML: `(function(){var s=localStorage.getItem('theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=s==='light'||s==='dark'?s:(d?'dark':'light');var r=document.documentElement;r.dataset.theme=t;r.classList.toggle('dark',t==='dark');})();`,
+          innerHTML: `(function(){var s=localStorage.getItem('theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=s==='light'||s==='dark'?s:(d?'dark':'light');var r=document.documentElement;r.dataset.theme=t;r.style.colorScheme=t;r.classList.toggle('dark',t==='dark');r.style.backgroundColor=t==='dark'?'rgb(24 24 27)':'rgb(244 244 245)';})();`,
           type: 'text/javascript',
+          tagPriority: 'critical',
+        },
+      ],
+      style: [
+        {
+          innerHTML: `body{margin:0}#__nuxt{opacity:0}html.nuxt-ready #__nuxt{opacity:1;transition:opacity .12s ease}html[data-theme=dark]{background-color:rgb(24 24 27)}html[data-theme=light],html:not([data-theme]){background-color:rgb(244 244 245)}`,
           tagPriority: 'critical',
         },
       ],

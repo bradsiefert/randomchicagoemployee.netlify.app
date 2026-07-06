@@ -15,12 +15,19 @@ useHead({
 
 <style lang="css">
   html {
-    color-scheme: light dark;
     background-color: rgb(244 244 245);
+  }
+
+  html.page-ready {
     transition: background-color 0.3s ease;
   }
 
+  html[data-theme='light'] {
+    color-scheme: light;
+  }
+
   html[data-theme='dark'] {
+    color-scheme: dark;
     background-color: rgb(24 24 27);
   }
 
